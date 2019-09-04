@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import merge from 'element-ui/src/utils/merge';
-import { getKeysMap, getRowIdentity, getColumnById, getColumnByKey, orderBy, toggleRowStatus } from '../util';
+import { getKeysMap, getRowIdentity, getColumnById, getColumnByKey, orderBy, toggleRowSelectionWithTree } from '../util';
 import expand from './expand';
 import current from './current';
 import tree from './tree';
@@ -154,9 +154,8 @@ export default Vue.extend({
         this.table.$emit('selection-change', newSelection.slice());
       }
     },
-
     toggleRowSelection(row, selected, emitChange = true) {
-      const changed = toggleRowStatus(this.states.selection, row, selected);
+      const changed = toggleRowSelectionWithTree(this.states.selection, row, selected);
       if (changed) {
         const newSelection = (this.states.selection || []).slice();
         // 调用 API 修改选中值，不触发 select 事件
@@ -166,7 +165,6 @@ export default Vue.extend({
         this.table.$emit('selection-change', newSelection);
       }
     },
-
     _toggleAllSelection() {
       const states = this.states;
       const { data = [], selection } = states;
@@ -180,11 +178,11 @@ export default Vue.extend({
       let selectionChanged = false;
       data.forEach((row, index) => {
         if (states.selectable) {
-          if (states.selectable.call(null, row, index) && toggleRowStatus(selection, row, value)) {
+          if (states.selectable.call(null, row, index) && toggleRowSelectionWithTree(selection, row, value)) {
             selectionChanged = true;
           }
         } else {
-          if (toggleRowStatus(selection, row, value)) {
+          if (toggleRowSelectionWithTree(selection, row, value)) {
             selectionChanged = true;
           }
         }

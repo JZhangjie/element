@@ -194,7 +194,18 @@ export function compose(...funcs) {
   }
   return funcs.reduce((a, b) => (...args) => a(b(...args)));
 }
-
+//树形表单节点选中状态改变时
+export function toggleRowSelectionWithTree(selection, row, selected) {
+  let changed = toggleRowStatus(selection, row, selected);
+  if (row && row.children) {
+    const index = selection.indexOf(row);
+    const included = index !== -1;
+    row.children.forEach(function(crow) {
+      toggleRowSelectionWithTree(selection, crow, included);
+    });
+  }
+  return changed;
+}
 export function toggleRowStatus(statusArr, row, newVal) {
   let changed = false;
   const index = statusArr.indexOf(row);
